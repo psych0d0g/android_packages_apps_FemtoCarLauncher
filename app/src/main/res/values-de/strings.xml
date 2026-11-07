@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AVIN Avant 4 fork: German strings for the vehicle additions only. -->
+<resources>
+    <string name="vehicle_supply">Bordnetz</string>
+    <string name="vehicle_lights">Licht</string>
+    <string name="vehicle_reverse">Rückwärtsgang</string>
+    <string name="vehicle_on">an</string>
+    <string name="vehicle_off">aus</string>
+    <string name="vehicle_engaged">eingelegt</string>
+    <string name="vehicle_outside">Außentemperatur</string>
+</resources>

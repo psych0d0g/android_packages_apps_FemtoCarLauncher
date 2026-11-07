@@ -42,10 +42,12 @@ import com.composables.icons.lucide.Wifi
 import com.composables.icons.lucide.WifiHigh
 import com.composables.icons.lucide.WifiLow
 import com.composables.icons.lucide.WifiZero
+import com.composables.icons.lucide.Zap
 import io.github.seijikohara.femto.R
 import io.github.seijikohara.femto.data.display.MotionTier
 import io.github.seijikohara.femto.data.dock.DockStatusId
 import io.github.seijikohara.femto.data.system.SystemStatus
+import io.github.seijikohara.femto.data.vehicle.rememberVehicleState
 import io.github.seijikohara.femto.ui.home.HomeAction
 import io.github.seijikohara.femto.ui.theme.FemtoIcon
 import io.github.seijikohara.femto.ui.theme.Motion
@@ -235,7 +237,13 @@ private fun StatusIndicator(
         }
 
         DockStatusId.BATTERY -> {
-            BatteryIndicator(percent = status.batteryPercent, charging = status.charging, tier = tier)
+            // AVIN Avant 4 fork: the head unit has no battery; show the vehicle supply voltage.
+            val vehicle = rememberVehicleState()
+            if (vehicle != null) {
+                SupplyIndicator(supplyMv = vehicle.supplyMv)
+            } else {
+                BatteryIndicator(percent = status.batteryPercent, charging = status.charging, tier = tier)
+            }
         }
     }
 }
@@ -393,4 +401,28 @@ private fun BatteryIndicator(
             maxLines = 1,
         )
     }
+}
+
+// AVIN Avant 4 fork: supply voltage in place of the battery level.
+@Composable
+private fun SupplyIndicator(
+    supplyMv: Int?,
+    modifier: Modifier = Modifier,
+) = Column(
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.spacedBy(1.dp),
+    modifier = modifier,
+) {
+    FemtoIcon(
+        imageVector = Lucide.Zap,
+        contentDescription = stringResource(R.string.vehicle_supply),
+        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.size(20.dp),
+    )
+    Text(
+        text = formatSupply(supplyMv),
+        style = MaterialTheme.typography.glanceCaption(),
+        color = MaterialTheme.colorScheme.onSurface,
+        maxLines = 1,
+    )
 }

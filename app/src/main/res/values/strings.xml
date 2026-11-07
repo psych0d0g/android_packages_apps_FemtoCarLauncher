@@ -637,4 +637,12 @@
     <!-- %1$s = the installed version name -->
     <string name="notification_update_title">Updated to %1$s</string>
     <string name="notification_update_text">Tap to open.</string>
+    <!-- AVIN Avant 4 fork: vehicle card and supply-voltage indicator -->
+    <string name="vehicle_supply">Supply</string>
+    <string name="vehicle_lights">Lights</string>
+    <string name="vehicle_reverse">Reverse gear</string>
+    <string name="vehicle_on">on</string>
+    <string name="vehicle_off">off</string>
+    <string name="vehicle_engaged">engaged</string>
+    <string name="vehicle_outside">Outside temperature</string>
 </resources>

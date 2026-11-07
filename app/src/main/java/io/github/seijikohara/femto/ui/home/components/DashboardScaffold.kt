@@ -51,6 +51,7 @@ import io.github.seijikohara.femto.data.display.DriverSide
 import io.github.seijikohara.femto.data.display.MotionTier
 import io.github.seijikohara.femto.data.music.MusicCardState
 import io.github.seijikohara.femto.data.places.PlaceTarget
+import io.github.seijikohara.femto.data.vehicle.rememberVehicleState
 import io.github.seijikohara.femto.ui.destination.DestinationPanelHost
 import io.github.seijikohara.femto.ui.drawer.AppDrawerPanelHost
 import io.github.seijikohara.femto.ui.home.HomeAction
@@ -1263,18 +1264,29 @@ private fun FloatingCardColumn(
             dateOnly = calendarDateOnly,
         )
     }
+    // AVIN Avant 4 fork: on the head unit the weather slot shows the vehicle diagnosis.
+    val vehicle = rememberVehicleState()
     val weather: @Composable (Modifier) -> Unit = { cardModifier ->
-        WeatherCard(
-            snapshot = uiState.weather,
-            temperatureUnit = temperatureUnit,
-            speedUnit = speedUnit,
-            is24Hour = is24Hour,
-            onExpand = onExpandWeather,
-            hazeState = hazeState,
-            glassConfig = glassConfig,
-            motionTier = motionTier,
-            modifier = cardModifier,
-        )
+        if (vehicle != null) {
+            VehicleCard(
+                state = vehicle,
+                hazeState = hazeState,
+                glassConfig = glassConfig,
+                modifier = cardModifier,
+            )
+        } else {
+            WeatherCard(
+                snapshot = uiState.weather,
+                temperatureUnit = temperatureUnit,
+                speedUnit = speedUnit,
+                is24Hour = is24Hour,
+                onExpand = onExpandWeather,
+                hazeState = hazeState,
+                glassConfig = glassConfig,
+                motionTier = motionTier,
+                modifier = cardModifier,
+            )
+        }
     }
     val music: @Composable (Modifier) -> Unit = { cardModifier ->
         MusicCard(
