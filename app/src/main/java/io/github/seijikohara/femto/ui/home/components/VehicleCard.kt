@@ -39,7 +39,7 @@ import java.util.Locale
 private const val LOW_SUPPLY_MV = 11_800
 
 internal fun formatOutside(milliC: Int?): String =
-    milliC?.let { String.format(Locale.getDefault(), "%+.1f°", it / 1000.0) } ?: "—"
+    milliC?.let { String.format(Locale.getDefault(), "%.1f °C", it / 1000.0) } ?: "—"
 
 internal fun formatSupply(mv: Int?): String =
     mv?.let { String.format(Locale.getDefault(), "%.1f V", it / 1000.0) } ?: "—"
@@ -75,10 +75,11 @@ internal fun VehicleCard(
             Text(
                 text = formatOutside(state.outsideMilliC),
                 style = MaterialTheme.typography.bigNumber(
-                    size = FemtoDimens.Text4Xl,
+                    size = FemtoDimens.Text3Xl,
                     weight = MaterialTheme.typography.normalWeight,
                 ),
                 maxLines = 1,
+                softWrap = false,
                 modifier = Modifier.padding(start = 8.dp),
             )
         }
