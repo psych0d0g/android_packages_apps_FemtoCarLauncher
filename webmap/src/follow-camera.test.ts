@@ -157,4 +157,21 @@ describe("the OSM follow engine", () => {
             essential: true,
         });
     });
+
+    it("keeps the camera still for a parked vehicle's unchanged fixes", () => {
+        const page = setup();
+        page.push(FIX);
+        vi.advanceTimersByTime(1_000);
+        page.push(FIX);
+        const moves = page.map.eases.length + page.map.jumps.length;
+        vi.advanceTimersByTime(1_000);
+        page.push(FIX);
+        vi.advanceTimersByTime(1_000);
+        page.push({ lat: FIX.lat + 1e-8, lon: FIX.lon });
+        expect(page.map.eases.length + page.map.jumps.length).toBe(moves);
+        // A real move still eases the camera.
+        vi.advanceTimersByTime(1_000);
+        page.push({ lat: FIX.lat + 1e-4, lon: FIX.lon });
+        expect(page.map.eases.length + page.map.jumps.length).toBe(moves + 1);
+    });
 });

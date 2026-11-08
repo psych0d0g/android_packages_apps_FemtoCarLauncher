@@ -19,6 +19,7 @@ import {
     followOrientation,
     isPaddingOnlyReflow,
     isRealPosition,
+    isStillFollowFix,
     LAYOUT_REFLOW_MS,
     LOCATION_STALE_THRESHOLD_MS,
     markerTransitionStep,
@@ -313,6 +314,29 @@ export function createFollowEngine(deps: FollowEngineDeps): FollowEngine {
             state.lastBearing = heading;
             const previousZoom = state.lastPushedZoom;
             state.lastPushedZoom = Number.isFinite(zoom) ? zoom : 16;
+            // A parked vehicle's fix that would not visibly move the camera:
+            // keep the camera (and the last applied fix, so slow drift still
+            // adds up to a move) instead of starting another one-second ease —
+            // see FOLLOW_STILL_PX.
+            if (
+                state.following &&
+                !signalGap &&
+                !state.firstCamera &&
+                markerTransition.remainingMs() === 0 &&
+                isStillFollowFix(previousFix, {
+                    lon,
+                    lat,
+                    heading,
+                    zoom: state.lastPushedZoom,
+                    tilt: tilt || 0,
+                    markerPos: markerPos || 0,
+                    bottomSafe: bottomSafe || 0,
+                    rightSafe: rightSafe || 0,
+                    leftSafe: leftSafe || 0,
+                })
+            ) {
+                return;
+            }
             state.lastFix = {
                 lon,
                 lat,

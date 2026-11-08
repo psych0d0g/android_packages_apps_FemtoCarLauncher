@@ -242,6 +242,52 @@ export function isPaddingOnlyReflow(previous: ReflowFix | null, next: ReflowFix)
     );
 }
 
+// A parked vehicle still gets a fix every second, usually with the same or a
+// centimetre-different position. Easing the camera to it anyway keeps MapLibre
+// rendering continuously (each ease lasts until the next fix), which on a
+// head unit (RK3399, pitched 3D map) costs more than a full big core in the
+// launcher's RenderThread plus the WebView GPU thread. A fix whose camera
+// would move by less than this many screen pixels — with the same zoom, tilt,
+// padding and (within FOLLOW_STILL_BEARING_DEG) heading — is skipped.
+export const FOLLOW_STILL_PX = 0.5;
+export const FOLLOW_STILL_BEARING_DEG = 0.5;
+
+// Web Mercator ground resolution of MapLibre's 512-px tiles, metres per pixel.
+const EARTH_CIRCUMFERENCE_M = 40_075_016.686;
+const TILE_SIZE_PX = 512;
+
+export interface FollowFix extends ReflowFix {
+    heading: number;
+    zoom: number;
+    tilt: number;
+}
+
+// True when [next] would leave the follow camera visually where [previous]
+// put it: see FOLLOW_STILL_PX. Any other change (zoom, tilt, padding, a real
+// turn) returns false so it is applied as before.
+export function isStillFollowFix(previous: FollowFix | null, next: FollowFix): boolean {
+    if (!previous) return false;
+    if (
+        previous.zoom !== next.zoom ||
+        previous.tilt !== next.tilt ||
+        previous.markerPos !== next.markerPos ||
+        previous.bottomSafe !== next.bottomSafe ||
+        previous.rightSafe !== next.rightSafe ||
+        previous.leftSafe !== next.leftSafe
+    ) {
+        return false;
+    }
+    const turn = Math.abs(((((next.heading - previous.heading) % 360) + 540) % 360) - 180);
+    if (turn >= FOLLOW_STILL_BEARING_DEG) return false;
+    const latRad = (next.lat * Math.PI) / 180;
+    const metresPerPx =
+        (EARTH_CIRCUMFERENCE_M * Math.cos(latRad)) / (TILE_SIZE_PX * 2 ** next.zoom);
+    const metresPerDeg = EARTH_CIRCUMFERENCE_M / 360;
+    const dx = (next.lon - previous.lon) * metresPerDeg * Math.cos(latRad);
+    const dy = (next.lat - previous.lat) * metresPerDeg;
+    return Math.hypot(dx, dy) / metresPerPx < FOLLOW_STILL_PX;
+}
+
 // Fixed lockstep duration for a padding-only reflow, used by both backends'
 // follow machines: the marker's CSS transition and the camera ease both run
 // this long, so they land together. A reflow is driven by a dashboard layout

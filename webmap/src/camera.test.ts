@@ -7,8 +7,11 @@ import {
     defaultEase,
     easeDurationMs,
     followMotion,
+    FOLLOW_STILL_PX,
+    type FollowFix,
     followOrientation,
     isPaddingOnlyReflow,
+    isStillFollowFix,
     isRealPosition,
     linearEase,
     markerTransitionStep,
@@ -347,5 +350,52 @@ describe("isRealPosition", () => {
     it("rejects a coordinate off the globe", () => {
         expect(isRealPosition(MAX_LATITUDE_DEG + 1, 0)).toBe(false);
         expect(isRealPosition(0, -MAX_LONGITUDE_DEG - 1)).toBe(false);
+    });
+});
+
+describe("isStillFollowFix", () => {
+    const base: FollowFix = {
+        lon: 8.603381,
+        lat: 49.264398,
+        heading: 0,
+        zoom: 16,
+        tilt: 55,
+        markerPos: 70,
+        bottomSafe: 0.1,
+        rightSafe: 0.428,
+        leftSafe: 0,
+    };
+    // Metres per screen pixel at the base fix (MapLibre's 512-px tiles).
+    const metresPerPx =
+        (40_075_016.686 * Math.cos((base.lat * Math.PI) / 180)) / (512 * 2 ** base.zoom);
+    const degLatPerMetre = 360 / 40_075_016.686;
+
+    it("is false without a previous fix", () => {
+        expect(isStillFollowFix(null, base)).toBe(false);
+    });
+
+    it("treats the same fix as still", () => {
+        expect(isStillFollowFix(base, { ...base })).toBe(true);
+    });
+
+    it("treats sub-pixel GPS noise as still", () => {
+        const shift = metresPerPx * FOLLOW_STILL_PX * 0.5 * degLatPerMetre;
+        expect(isStillFollowFix(base, { ...base, lat: base.lat + shift })).toBe(true);
+    });
+
+    it("applies a move of a pixel or more", () => {
+        const shift = metresPerPx * FOLLOW_STILL_PX * 2 * degLatPerMetre;
+        expect(isStillFollowFix(base, { ...base, lat: base.lat + shift })).toBe(false);
+    });
+
+    it("applies a turn, also across north", () => {
+        expect(isStillFollowFix(base, { ...base, heading: 2 })).toBe(false);
+        expect(isStillFollowFix({ ...base, heading: 359.9 }, { ...base, heading: 0.1 })).toBe(true);
+    });
+
+    it("applies zoom, tilt and padding changes", () => {
+        expect(isStillFollowFix(base, { ...base, zoom: 17 })).toBe(false);
+        expect(isStillFollowFix(base, { ...base, tilt: 0 })).toBe(false);
+        expect(isStillFollowFix(base, { ...base, rightSafe: 0 })).toBe(false);
     });
 });

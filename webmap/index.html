@@ -87,7 +87,11 @@
                 background: var(--marker-color, #3367d6);
                 border: 1.5px solid var(--marker-color, #3367d6);
                 box-sizing: border-box;
-                animation: marker-ripple 2.8s linear infinite;
+                /* Three pulses, not infinite: a never-ending CSS animation keeps the
+         WebView compositing every frame, and the launcher with it (on an RK3399
+         head unit more than a big core while parked). Hiding the ripple while
+         .stale resets the animation, so it pulses again when the fix returns. */
+                animation: marker-ripple 2.8s linear 3 forwards;
             }
             @keyframes marker-ripple {
                 0% {
