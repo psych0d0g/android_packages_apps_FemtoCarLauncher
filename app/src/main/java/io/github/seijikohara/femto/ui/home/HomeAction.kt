@@ -76,6 +76,9 @@ internal sealed interface HomeAction {
 
     data object OpenSettings : HomeAction
 
+    /** AVIN Avant 4 fork: the head unit's restart dialog (vehicle app), there is no power key. */
+    data object OpenPowerMenu : HomeAction
+
     /**
      * The update prompt's "Later" (or its dismissal) for build [versionCode]:
      * the prompt never asks about it again, while the dock's dot and Settings

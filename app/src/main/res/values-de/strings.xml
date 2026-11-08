@@ -4,6 +4,7 @@
     <string name="vehicle_supply">Bordnetz</string>
     <string name="vehicle_lights">Licht</string>
     <string name="vehicle_reverse">Rückwärtsgang</string>
+    <string name="nav_power">Neustart</string>
     <string name="vehicle_on">an</string>
     <string name="vehicle_off">aus</string>
     <string name="vehicle_engaged">eingelegt</string>

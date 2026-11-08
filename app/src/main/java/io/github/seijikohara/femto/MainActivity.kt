@@ -66,6 +66,7 @@ import io.github.seijikohara.femto.ui.diagnostics.DiagnosticsSheet
 import io.github.seijikohara.femto.ui.fontpicker.FontPickerSheet
 import io.github.seijikohara.femto.ui.home.HomeEvent
 import io.github.seijikohara.femto.ui.home.HomeRoute
+import io.github.seijikohara.femto.ui.home.POWER_MENU_ACTION
 import io.github.seijikohara.femto.ui.home.components.DockConfig
 import io.github.seijikohara.femto.ui.home.components.GlassConfig
 import io.github.seijikohara.femto.ui.home.components.MapConfig
@@ -449,6 +450,10 @@ class MainActivity : ComponentActivity() {
 
             is HomeEvent.LaunchAppCategory -> {
                 launchAppCategory(event.intentCategory)
+            }
+
+            HomeEvent.OpenPowerMenu -> {
+                tryStartActivity(Intent(POWER_MENU_ACTION).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             }
 
             is HomeEvent.LaunchGeo -> {

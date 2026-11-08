@@ -21,8 +21,12 @@ import kotlin.test.assertTrue
  * a dock button or a status indicator re-derives them; the widths do NOT
  * follow, and are picked to straddle the two thresholds today's seven buttons
  * put at 672 dp and 912 dp. An eighth button moves both, and the 690 dp case
- * below would have to be re-picked with them.
+ * below would have to be re-picked with them. The AVIN Avant 4 fork's eighth
+ * button (POWER) leaves no width where the cluster hides but the pill still
+ * fits, so that one case keeps upstream's seven buttons.
  */
+private const val UPSTREAM_NAV_COUNT = 7
+
 class HorizontalDockUsesPillTest {
     private val navCount = DockNavId.entries.size
     private val statusCount = DockStatusId.entries.size
@@ -55,7 +59,7 @@ class HorizontalDockUsesPillTest {
     // the status threshold the reserve is already gone, so the pill fits again.
     @Test
     fun `a dock too narrow to show the status cluster keeps the pill`() =
-        assertTrue(horizontalDockUsesPill(DockWidth.COMPACT, 690.dp, navCount, statusCount))
+        assertTrue(horizontalDockUsesPill(DockWidth.COMPACT, 690.dp, UPSTREAM_NAV_COUNT, statusCount))
 }
 
 /**

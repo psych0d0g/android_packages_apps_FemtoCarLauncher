@@ -17,9 +17,10 @@ import kotlin.enums.enumEntries
  * position. The declaration order is the factory default order (today's
  * Phone / Apps / Music / Navigation / Browser / Assistant / Settings dock) —
  * [DashboardDock][io.github.seijikohara.femto.ui.home.components.DashboardDock]
- * maps each id to its icon / label / action.
+ * maps each id to its icon / label / action. AVIN Avant 4 fork: POWER opens the
+ * head unit's restart dialog (the unit has no physical power key).
  */
-internal enum class DockNavId { PHONE, APPS, MUSIC, NAVIGATION, BROWSER, ASSISTANT, SETTINGS }
+internal enum class DockNavId { PHONE, APPS, MUSIC, NAVIGATION, BROWSER, ASSISTANT, SETTINGS, POWER }
 
 /**
  * Stable identity for each dock status-cluster indicator, independent of its

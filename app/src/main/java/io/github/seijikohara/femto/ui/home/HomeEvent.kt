@@ -5,6 +5,9 @@ import io.github.seijikohara.femto.data.dock.DockNavId
 import io.github.seijikohara.femto.data.dock.DockStatusId
 import io.github.seijikohara.femto.data.places.PlaceTarget
 
+/** AVIN Avant 4 fork: intent action of the vehicle app's restart dialog. */
+internal const val POWER_MENU_ACTION = "com.avin.avant4.car.action.POWER_MENU"
+
 /**
  * One-shot side-effect signals emitted by [HomeViewModel] for the host to act on.
  *
@@ -80,6 +83,9 @@ internal sealed interface HomeEvent {
      * app, and the screen carries every data source's licence and link.
      */
     data object OpenLicenses : HomeEvent
+
+    /** AVIN Avant 4 fork: restart dialog of the vehicle app (action [POWER_MENU_ACTION]). */
+    data object OpenPowerMenu : HomeEvent
 
     /**
      * Open the assistant. The host resolves the user's assistant-launch setting:

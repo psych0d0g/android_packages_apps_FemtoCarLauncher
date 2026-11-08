@@ -166,6 +166,7 @@
     <string name="nav_browser">Browser</string>
     <string name="nav_assistant">Assistant</string>
     <string name="nav_settings">Settings</string>
+    <string name="nav_power">Restart</string>
 
     <!-- Destination panel (the dock's Navigation button) -->
     <string name="destination_title">Destination</string>

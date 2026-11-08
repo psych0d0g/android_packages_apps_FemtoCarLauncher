@@ -91,6 +91,7 @@ class DockPreferencesTest {
                     DockNavId.BROWSER,
                     DockNavId.ASSISTANT,
                     DockNavId.SETTINGS,
+                    DockNavId.POWER,
                 ),
                 store.navOrder.first(),
             )
@@ -127,6 +128,7 @@ class DockPreferencesTest {
                     DockNavId.BROWSER,
                     DockNavId.ASSISTANT,
                     DockNavId.SETTINGS,
+                    DockNavId.POWER,
                 ),
                 store.navOrder.first(),
             )
@@ -305,6 +307,7 @@ class ResolveDockOrderTest {
                 DockNavId.NAVIGATION,
                 DockNavId.BROWSER,
                 DockNavId.ASSISTANT,
+                DockNavId.POWER,
             ),
             resolveDockOrder<DockNavId>("SETTINGS\nPHONE"),
         )

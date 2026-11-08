@@ -337,6 +337,10 @@ internal class HomeViewModel(
                 mutableEvents.tryEmit(HomeEvent.OpenInAppSettings())
             }
 
+            HomeAction.OpenPowerMenu -> {
+                mutableEvents.tryEmit(HomeEvent.OpenPowerMenu)
+            }
+
             is HomeAction.UpdateLater -> {
                 answerUpdatePrompt(action.versionCode)
             }

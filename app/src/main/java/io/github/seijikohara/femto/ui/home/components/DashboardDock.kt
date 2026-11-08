@@ -60,6 +60,7 @@ import com.composables.icons.lucide.Mic
 import com.composables.icons.lucide.Music
 import com.composables.icons.lucide.Navigation
 import com.composables.icons.lucide.Phone
+import com.composables.icons.lucide.Power
 import com.composables.icons.lucide.RotateCcw
 import com.composables.icons.lucide.Settings
 import dev.chrisbanes.haze.HazeState
@@ -217,6 +218,7 @@ internal fun navSpecFor(id: DockNavId): NavSpec =
         DockNavId.BROWSER -> NavSpec(Lucide.Globe, R.string.nav_browser, HomeAction.OpenBrowser)
         DockNavId.ASSISTANT -> NavSpec(Lucide.Mic, R.string.nav_assistant, HomeAction.OpenAssistant)
         DockNavId.SETTINGS -> NavSpec(Lucide.Settings, R.string.nav_settings, HomeAction.OpenSettings)
+        DockNavId.POWER -> NavSpec(Lucide.Power, R.string.nav_power, HomeAction.OpenPowerMenu)
     }
 
 /**
