@@ -24,14 +24,36 @@ internal data class VehicleState(
     val lights: Boolean?,
     /** Reverse gear engaged. */
     val reverse: Boolean?,
+    /** Huawei HiLink modem on the head unit (vehicle app), null without a stick. */
+    val modem: ModemState? = null,
 )
+
+/** Cellular stick as reported by the vehicle app: "type|operator|level 0..5|R". */
+internal data class ModemState(
+    val type: String,
+    val operator: String,
+    val level: Int,
+    val roaming: Boolean,
+)
+
+internal fun parseModem(value: String?): ModemState? {
+    val parts = value?.split('|') ?: return null
+    if (parts.size < 3) return null
+    return ModemState(
+        type = parts[0],
+        operator = parts[1],
+        level = parts[2].toIntOrNull()?.coerceIn(0, 5) ?: 0,
+        roaming = parts.getOrNull(3) == "R",
+    )
+}
 
 internal object VehicleKeys {
     const val SUPPLY = "avant4_supply_mv"
     const val OUTSIDE = "avant4_outside_mc"
     const val LIGHTS = "avant4_lights"
     const val REVERSE = "avant4_reverse"
-    val ALL = listOf(SUPPLY, OUTSIDE, LIGHTS, REVERSE)
+    const val MODEM = "avant4_modem_info"
+    val ALL = listOf(SUPPLY, OUTSIDE, LIGHTS, REVERSE, MODEM)
 }
 
 private fun ContentResolver.intOrNull(key: String): Int? =
@@ -54,6 +76,7 @@ internal fun ContentResolver.readVehicleState(): VehicleState? {
         outsideMilliC = intOrNull(VehicleKeys.OUTSIDE),
         lights = boolOrNull(VehicleKeys.LIGHTS),
         reverse = boolOrNull(VehicleKeys.REVERSE),
+        modem = parseModem(Settings.System.getString(this, VehicleKeys.MODEM)),
     )
 }
 

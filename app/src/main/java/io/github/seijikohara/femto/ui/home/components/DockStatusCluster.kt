@@ -47,6 +47,7 @@ import io.github.seijikohara.femto.R
 import io.github.seijikohara.femto.data.display.MotionTier
 import io.github.seijikohara.femto.data.dock.DockStatusId
 import io.github.seijikohara.femto.data.system.SystemStatus
+import io.github.seijikohara.femto.data.vehicle.ModemState
 import io.github.seijikohara.femto.data.vehicle.rememberVehicleState
 import io.github.seijikohara.femto.ui.home.HomeAction
 import io.github.seijikohara.femto.ui.theme.FemtoIcon
@@ -176,26 +177,12 @@ private fun StatusIndicator(
 ) {
     when (id) {
         DockStatusId.CELLULAR -> {
-            status.cellularConnected?.let { connected ->
-                val level = status.cellularSignalLevel
-                // Drive the lit state off signal presence when the level is known: on a
-                // Wi-Fi-primary head unit the cellular network repeatedly drops in and out
-                // of NET_CAPABILITY_VALIDATED (Wi-Fi owns the default route), which flickered
-                // the icon. A known SignalStrength.level tracks the radio directly and is
-                // stable; fall back to the validated-connectivity flag only when the level is
-                // unknown (READ_PHONE_STATE withheld).
-                val active = level?.let { it > 0 } ?: connected
-                StatusIcon(
-                    // A known level picks the graduated bars; a null level (READ_PHONE_STATE
-                    // withheld / no reading yet) degrades to the binary connected icon.
-                    icon = level?.let { cellularIconForLevel(it) } ?: Lucide.Signal,
-                    active = active,
-                    description =
-                        stringResource(
-                            if (active) R.string.status_cellular_connected else R.string.status_cellular_disconnected,
-                        ),
-                    tier = tier,
-                )
+            // AVIN Avant 4 fork: no telephony; the cellular stick's signal comes from the vehicle app.
+            val modem = rememberVehicleState()?.modem
+            if (modem != null) {
+                ModemIndicator(modem = modem, tier = tier)
+            } else {
+                CellularIndicator(status = status, tier = tier)
             }
         }
 
@@ -398,6 +385,71 @@ private fun BatteryIndicator(
             text = if (pct == null) "—" else stringResource(R.string.battery_percent, pct),
             style = MaterialTheme.typography.glanceCaption(),
             color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+        )
+    }
+}
+
+// The stock telephony indicator, unchanged; split out so the fork can render the stick instead.
+@Composable
+private fun CellularIndicator(
+    status: SystemStatus,
+    tier: MotionTier,
+) {
+    status.cellularConnected?.let { connected ->
+        val level = status.cellularSignalLevel
+        // Drive the lit state off signal presence when the level is known: on a
+        // Wi-Fi-primary head unit the cellular network repeatedly drops in and out
+        // of NET_CAPABILITY_VALIDATED (Wi-Fi owns the default route), which flickered
+        // the icon. A known SignalStrength.level tracks the radio directly and is
+        // stable; fall back to the validated-connectivity flag only when the level is
+        // unknown (READ_PHONE_STATE withheld).
+        val active = level?.let { it > 0 } ?: connected
+        StatusIcon(
+            // A known level picks the graduated bars; a null level (READ_PHONE_STATE
+            // withheld / no reading yet) degrades to the binary connected icon.
+            icon = level?.let { cellularIconForLevel(it) } ?: Lucide.Signal,
+            active = active,
+            description =
+                stringResource(
+                    if (active) R.string.status_cellular_connected else R.string.status_cellular_disconnected,
+                ),
+            tier = tier,
+        )
+    }
+}
+
+// AVIN Avant 4 fork: HiLink stick bars (0..5 mapped onto the 0..4 ramp) over the network type.
+@Composable
+private fun ModemIndicator(
+    modem: ModemState,
+    tier: MotionTier,
+    modifier: Modifier = Modifier,
+) = Motion.ContentCrossfade(
+    targetState = Pair(modem.level, modem.type),
+    tier = tier,
+    label = "modem",
+    modifier = modifier,
+) { (level, type) ->
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(1.dp),
+    ) {
+        val active = level > 0
+        val tint = if (active) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline
+        FemtoIcon(
+            imageVector = cellularIconForLevel(minOf(level, 4)),
+            contentDescription =
+                stringResource(
+                    if (active) R.string.status_cellular_connected else R.string.status_cellular_disconnected,
+                ),
+            tint = tint,
+            modifier = Modifier.size(20.dp),
+        )
+        Text(
+            text = type.ifEmpty { "—" },
+            style = MaterialTheme.typography.glanceCaption(),
+            color = tint,
             maxLines = 1,
         )
     }
