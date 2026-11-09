@@ -214,6 +214,10 @@ internal fun MusicMetaAndProgress(
     val secondaryStyle = remember(typography) { typography.cardMeta() }
     val density = LocalDensity.current
     val lineGapPx = with(density) { MetaLineGap.roundToPx() }
+    // AVIN Avant 4 fork: scroll only while something plays. A paused card is a
+    // static glance target, and an endless marquee keeps the frame clock running
+    // (~25 fps, about half a core on the RK3399) for text nobody is following.
+    val marquee = stationary && isPlaying
     val progressGapPx = with(density) { FemtoDimens.CardSectionGapCompact.roundToPx() }
     Layout(
         modifier = modifier.fillMaxWidth(),
@@ -224,7 +228,7 @@ internal fun MusicMetaAndProgress(
                 style = titleStyle,
                 color = MaterialTheme.colorScheme.onSurface,
                 tier = motionTier,
-                marquee = stationary,
+                marquee = marquee,
             )
             MetaLine(
                 // Radio / stream tracks often carry no artist; show an em dash so the
@@ -233,7 +237,7 @@ internal fun MusicMetaAndProgress(
                 style = secondaryStyle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 tier = motionTier,
-                marquee = stationary,
+                marquee = marquee,
             )
             // Composed only when showAlbum is on: the setting hides the album line
             // unconditionally, so its text must never exist in the tree (not merely
@@ -247,7 +251,7 @@ internal fun MusicMetaAndProgress(
                     style = secondaryStyle,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     tier = motionTier,
-                    marquee = stationary,
+                    marquee = marquee,
                 )
             } else {
                 Spacer(modifier = Modifier.size(0.dp))
