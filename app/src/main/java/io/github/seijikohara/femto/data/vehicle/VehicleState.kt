@@ -26,7 +26,32 @@ internal data class VehicleState(
     val reverse: Boolean?,
     /** Huawei HiLink modem on the head unit (vehicle app), null without a stick. */
     val modem: ModemState? = null,
-)
+    /** Open doors as a [Doors] bit mask (CAN box), null when the box reports none. */
+    val doors: Int? = null,
+    /** Supply voltage below which the card warns, in mV (vehicle app setting). */
+    val supplyWarnMv: Int = DEFAULT_SUPPLY_WARN_MV,
+) {
+    val supplyLow: Boolean get() = supplyMv?.let { it < supplyWarnMv } ?: false
+}
+
+/** Resting voltage of a 12 V system worth a glance (weak battery or no charging). */
+internal const val DEFAULT_SUPPLY_WARN_MV = 11_800
+
+/** Bits of [VehicleState.doors], as the vehicle app publishes them. The rear window counts as tailgate. */
+internal object Doors {
+    const val DRIVER = 1
+    const val PASSENGER = 2
+    const val REAR_LEFT = 4
+    const val REAR_RIGHT = 8
+    const val TAILGATE = 16
+    const val ALL = DRIVER or PASSENGER or REAR_LEFT or REAR_RIGHT or TAILGATE
+
+    /** Mask from the raw setting: negative (-1, Int.MIN_VALUE) means no data. */
+    fun parse(raw: Int?): Int? = raw?.takeIf { it >= 0 }?.and(ALL)
+}
+
+/** Warning threshold from the raw setting, the default when missing or implausible. */
+internal fun parseSupplyWarnMv(raw: Int?): Int = raw?.takeIf { it > 0 } ?: DEFAULT_SUPPLY_WARN_MV
 
 /** Cellular stick as reported by the vehicle app: "type|operator|level 0..5|R". */
 internal data class ModemState(
@@ -53,7 +78,9 @@ internal object VehicleKeys {
     const val LIGHTS = "avant4_lights"
     const val REVERSE = "avant4_reverse"
     const val MODEM = "avant4_modem_info"
-    val ALL = listOf(SUPPLY, OUTSIDE, LIGHTS, REVERSE, MODEM)
+    const val DOORS = "avant4_doors"
+    const val SUPPLY_WARN = "avant4_supply_warn_mv"
+    val ALL = listOf(SUPPLY, OUTSIDE, LIGHTS, REVERSE, MODEM, DOORS, SUPPLY_WARN)
 }
 
 private fun ContentResolver.intOrNull(key: String): Int? =
@@ -77,6 +104,8 @@ internal fun ContentResolver.readVehicleState(): VehicleState? {
         lights = boolOrNull(VehicleKeys.LIGHTS),
         reverse = boolOrNull(VehicleKeys.REVERSE),
         modem = parseModem(Settings.System.getString(this, VehicleKeys.MODEM)),
+        doors = Doors.parse(intOrNull(VehicleKeys.DOORS)),
+        supplyWarnMv = parseSupplyWarnMv(intOrNull(VehicleKeys.SUPPLY_WARN)),
     )
 }
 

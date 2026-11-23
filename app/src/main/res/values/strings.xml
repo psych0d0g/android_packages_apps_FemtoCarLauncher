@@ -646,4 +646,15 @@
     <string name="vehicle_off">off</string>
     <string name="vehicle_engaged">engaged</string>
     <string name="vehicle_outside">Outside temperature</string>
+    <string name="vehicle_doors">Doors</string>
+    <string name="vehicle_doors_closed">all closed</string>
+    <string name="vehicle_door_open_driver">Driver\'s door open</string>
+    <string name="vehicle_door_open_passenger">Passenger door open</string>
+    <string name="vehicle_door_open_rear_left">Rear left door open</string>
+    <string name="vehicle_door_open_rear_right">Rear right door open</string>
+    <string name="vehicle_door_open_tailgate">Tailgate open</string>
+    <plurals name="vehicle_doors_open_count">
+        <item quantity="one">%d door open</item>
+        <item quantity="other">%d doors open</item>
+    </plurals>
 </resources>

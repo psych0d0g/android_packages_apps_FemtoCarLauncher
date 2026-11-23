@@ -35,9 +35,6 @@ import io.github.seijikohara.femto.ui.theme.glanceCaption
 import io.github.seijikohara.femto.ui.theme.normalWeight
 import java.util.Locale
 
-// A 12 V system below this resting voltage is worth a glance (weak battery or no charging).
-private const val LOW_SUPPLY_MV = 11_800
-
 internal fun formatOutside(milliC: Int?): String =
     milliC?.let { String.format(Locale.getDefault(), "%.1f °C", it / 1000.0) } ?: "—"
 
@@ -56,12 +53,23 @@ internal fun VehicleCard(
     color = Color.Transparent,
     contentColor = MaterialTheme.colorScheme.onSurface,
 ) {
-    Column(
+    VehicleValues(
+        state = state,
         modifier =
             Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .padding(FemtoDimens.CardPaddingCompact),
+    )
+}
+
+@Composable
+private fun VehicleValues(
+    state: VehicleState,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(FemtoDimens.CardSectionGapCompact),
     ) {
         // Hero: outside temperature, the value a driver glances for.
@@ -87,7 +95,7 @@ internal fun VehicleCard(
             icon = Lucide.Zap,
             label = stringResource(R.string.vehicle_supply),
             value = formatSupply(state.supplyMv),
-            warn = state.supplyMv?.let { it < LOW_SUPPLY_MV } ?: false,
+            warn = state.supplyLow,
         )
         VehicleRow(
             icon = if (state.lights == true) Lucide.Lightbulb else Lucide.LightbulbOff,
@@ -107,6 +115,8 @@ internal fun VehicleCard(
                 warn = true,
             )
         }
+        // Doors only where the CAN box reports them (no mask from the vehicle app otherwise).
+        state.doors?.let { VehicleDoors(doors = it) }
     }
 }
 

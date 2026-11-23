@@ -9,4 +9,15 @@
     <string name="vehicle_off">aus</string>
     <string name="vehicle_engaged">eingelegt</string>
     <string name="vehicle_outside">Außentemperatur</string>
+    <string name="vehicle_doors">Türen</string>
+    <string name="vehicle_doors_closed">alle zu</string>
+    <string name="vehicle_door_open_driver">Fahrertür offen</string>
+    <string name="vehicle_door_open_passenger">Beifahrertür offen</string>
+    <string name="vehicle_door_open_rear_left">Tür hinten links offen</string>
+    <string name="vehicle_door_open_rear_right">Tür hinten rechts offen</string>
+    <string name="vehicle_door_open_tailgate">Heckklappe offen</string>
+    <plurals name="vehicle_doors_open_count">
+        <item quantity="one">%d Tür offen</item>
+        <item quantity="other">%d Türen offen</item>
+    </plurals>
 </resources>
